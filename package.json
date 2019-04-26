@@ -1,12 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "start": "homebridge -U $PWD/config -P $PWD/homebridge-esp8266-plugin",
-    "reset": "rimraf config/accessories; rimraf config/persit"
+    "start": "homebridge -R -U $PWD/config -P $PWD/homebridge-daikin-plugin",
+    "reset": "rimraf config/accessories; rimraf config/persist"
   },
   "dependencies": {
     "bonjour": "^3.5.0",
-    "homebridge": "^0.4.46",
+    "homebridge": "^0.4.49",
     "mdns-resolver": "0.0.3"
   },
   "devDependencies": {
