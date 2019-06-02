@@ -43,3 +43,22 @@ npm start
 - [x] Implement [bonjour](https://www.npmjs.com/package/bonjour) to get rid of fixed IPs.
 - [x] Switch from a single accessory to a Homebridge platform with multiple ones.
 - [ ] Try out MQTT.
+
+## Links
+
+The main inspiration and some HomeKit terms explained.
+
+- https://github.com/oznu/homekit-daikin-ir-thermostat
+- https://github.com/oznu/homebridge-daikin-esp8266
+- http://blog.theodo.fr/2017/08/make-siri-perfect-home-companion-devices-not-supported-apple-homekit/
+- https://github.com/KhaosT/HAP-NodeJS/blob/81319b35d1588453cfcb1a823805643de7df74dc/lib/gen/HomeKitTypes.js
+
+Alternatives, not considered yet.
+
+- https://github.com/pfalcon/esp-open-sdk/
+- https://github.com/maximkulkin/esp-homekit-demo
+- https://diyprojects.io/project-esp8266-homekit-sha-2017-direct-inclusion-ios-without-homebridge/#.XIZniy2ZNGw
+
+Various techniques.
+- https://www.predic8.de/mqtt.htm
+- https://webscreens.github.io/openscreenprotocol/mdns.html
