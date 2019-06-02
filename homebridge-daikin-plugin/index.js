@@ -21,7 +21,6 @@ class Daikin {
 
     // TODO: Remove state
     this.targetTemperature = 18
-    this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.OFF
 
     this.service = new Service.Thermostat(this.config['name'])
 
@@ -66,13 +65,12 @@ class Daikin {
         this.host = await this.resolveHost(service)
         this.log(`Found the ESP8266 running at ${this.host}`)
 
-        // http
-        //   .request({ method: 'GET', hostname: '10.0.0.34', path: '/' })
-        //   .then((body) => {
-        //     this.log(`> ${body}`)
-        //     this.service.getCharacteristic(Characteristic.On).updateValue(body === 'on')
-        //   })
-        //   .catch((error) => this.log.error(error.message))
+        http
+          .request({ method: 'GET', hostname: this.host, path: '/' })
+          .then((body) => {
+            this.service.getCharacteristic(Characteristic.On).updateValue(body === 'on')
+          })
+          .catch((error) => this.log.error(error.message))
       } catch (err) {
         this.log.error(err)
       } finally {
@@ -114,11 +112,29 @@ class Daikin {
 
   setTargetHeatingCoolingState (value, callback) {
     this.log(`setTargetHeatingCoolingState: ${value}`)
-    this.targetHeatingCoolingState = value
-    callback()
+
+    if (this.host === null) {
+      this.log.warn('Host is null')
+      return
+    }
+
+    let on = value === Characteristic.TargetHeatingCoolingState.COOL
+
+    http
+      .request({ method: 'POST', hostname: this.host, body: on ? 'on' : 'off' })
+      .then((body) => { callback() })
+      .catch((error) => this.log.error(error.message))
   }
 
   getTargetHeatingCoolingState (callback) {
-    callback(null, this.targetHeatingCoolingState)
+    if (this.host === null) {
+      this.log.warn('Host is null')
+      return
+    }
+
+    http
+      .request({ method: 'GET', hostname: this.host })
+      .then((body) => { callback(null, body === 'on') })
+      .catch((error) => this.log.error(error.message))
   }
 }
