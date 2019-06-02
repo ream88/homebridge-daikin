@@ -4,11 +4,13 @@
 
 # homebridge-esp8266-example
 
-This is an example for building custom HomeKit appliances using [Homebridge](https://homebridge.io) and ESP8266-based microcontrollers.
+This is an example for building custom HomeKit appliances using
+[Homebridge](https://homebridge.io) and ESP8266-based micro-controllers.
 
 ## [sketch](/sketch)
 
-This is an Arduino sketch for any ESP8266-based microcontroller which allows the built-in LED to be toggled on and off via a simple HTTP API:
+This is an Arduino sketch for any ESP8266-based micro-controller which allows
+the built-in LED to be toggled on and off via a simple HTTP API:
 
 ```
 curl http://10.0.0.34
@@ -23,26 +25,28 @@ curl -d off http://10.0.0.34
 
 ### Usage
 
-Be sure to create a `sketch/config.h` based on `sketch/config.example.h` using your WiFi credentials. Either use the Arduino IDE or [something which builds upon the IDE](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino) to compile and flash this sketch onto the microcontroller. After booting and obtaining an IP the HTTP API should be ready and accepting your requests.
+Be sure to create a `sketch/config.h` based on `sketch/config.example.h` using
+your WiFi credentials. Either use the Arduino IDE or [something which builds
+upon the
+IDE](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino)
+to compile and flash this sketch onto the micro-controller. After booting and
+obtaining an IP the HTTP API should be ready and accepting your requests.
 
 ## [homebridge-esp8266-plugin](/homebridge-esp8266-plugin)
 
-This is a custom Homebridge plugin providing a simple switch accessory which allows you to toggle the LED via  the Home app on iOS/macOS or by using Siri on your Apple device including HomePod.
+This is a custom Homebridge plugin providing a simple switch accessory which
+allows you to toggle the LED via  the Home app on iOS/macOS or by using Siri on
+your Apple device including HomePod.
 
 ### Usage
 
-Nothing special here if you're used to Homebridge, just install the dependencies and start Homebridge:
+Nothing special here if you're used to Homebridge, just install the dependencies
+and start Homebridge:
 
 ```
 npm install
 npm start
 ```
-
-## TODOs
-
-- [x] Implement [bonjour](https://www.npmjs.com/package/bonjour) to get rid of fixed IPs.
-- [x] Switch from a single accessory to a Homebridge platform with multiple ones.
-- [ ] Try out MQTT.
 
 ## Links
 
@@ -58,7 +62,10 @@ Alternatives, not considered yet.
 - https://github.com/pfalcon/esp-open-sdk/
 - https://github.com/maximkulkin/esp-homekit-demo
 - https://diyprojects.io/project-esp8266-homekit-sha-2017-direct-inclusion-ios-without-homebridge/#.XIZniy2ZNGw
-
-Various techniques.
 - https://www.predic8.de/mqtt.htm
-- https://webscreens.github.io/openscreenprotocol/mdns.html
+
+## TODOs
+
+- [x] Implement [bonjour](https://www.npmjs.com/package/bonjour) to get rid of fixed IPs.
+- [x] Switch from a single accessory to a Homebridge platform with multiple ones.
+- [ ] Try out MQTT.
