@@ -6,8 +6,7 @@ const mdnsResolver = require('mdns-resolver')
 const PLUGIN_NAME = 'homebridge-daikin-plugin'
 const PLATFORM_NAME = 'daikin-esp8266'
 
-const MIN_TEMPERATURE = 18
-const MAX_TEMPERATURE = 32
+const DAIKIN = { MIN_TEMPERATURE: 18, MAX_TEMPERATURE: 32 }
 
 class Daikin {
   constructor (log, config) {
@@ -19,6 +18,7 @@ class Daikin {
       this.foundAccessory(service)
     })
 
+    // TODO: Remove state
     this.targetTemperature = 18
     this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.OFF
 
@@ -41,8 +41,8 @@ class Daikin {
       .getCharacteristic(Characteristic.TargetTemperature)
       .setProps({
         minStep: 1,
-        minValue: MIN_TEMPERATURE,
-        maxValue: MAX_TEMPERATURE
+        minValue: DAIKIN.MIN_TEMPERATURE,
+        maxValue: DAIKIN.MAX_TEMPERATURE
       })
       .on('get', this.getTargetTemperature.bind(this))
       .on('set', this.setTargetTemperature.bind(this))
@@ -56,6 +56,15 @@ class Daikin {
 
     // this.service
     //   .getCharacteristic(Characteristic.TemperatureDisplayUnits)
+  }
+
+  // @implements {homebridge/lib/server.js}
+  getServices () {
+    const info = new Service.AccessoryInformation()
+      .setCharacteristic(Characteristic.Manufacturer, 'Mario Uher')
+      .setCharacteristic(Characteristic.Model, 'LOLIN D1 mini')
+
+    return [info, this.service]
   }
 
   async foundAccessory (service) {
@@ -75,15 +84,6 @@ class Daikin {
       //   })
       //   .catch((error) => this.log.error(error.message))
     }
-  }
-
-  getServices () {
-    this.informationService = new Service.AccessoryInformation()
-    this.informationService
-      .setCharacteristic(Characteristic.Manufacturer, 'Mario Uher')
-      .setCharacteristic(Characteristic.Model, 'LOLIN D1 mini')
-
-    return [this.informationService, this.service]
   }
 
   setTargetTemperature (value, callback) {

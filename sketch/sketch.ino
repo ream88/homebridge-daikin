@@ -70,7 +70,7 @@ void setupBonjour()
     Serial.println("MDNS responder started");
   }
   mdns.addService("homebridge", "tcp", SERVER_PORT);
-  mdns.addServiceTxt("homebridge", "tcp", "type", "esp8266-switch");
+  mdns.addServiceTxt("homebridge", "tcp", "type", "daikin-esp8266");
   mdns.addServiceTxt("homebridge", "tcp", "mac", WiFi.macAddress());
 }
 
