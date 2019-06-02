@@ -1,22 +1,23 @@
-const { Service, Characteristic, uuid: UUID } = require('hap-nodejs')
+const { Service, Characteristic } = require('hap-nodejs')
 const bonjour = require('bonjour')
 const http = require('./http')
 const mdnsResolver = require('mdns-resolver')
 
+const BONJOUR_TYPE = 'homebridge'
 const PLUGIN_NAME = 'homebridge-daikin-plugin'
 const PLATFORM_NAME = 'daikin-esp8266'
 
 const DAIKIN = { MIN_TEMPERATURE: 18, MAX_TEMPERATURE: 32 }
 
+module.exports = (homebridge) => {
+  homebridge.registerAccessory(PLUGIN_NAME, PLATFORM_NAME, Daikin)
+}
+
 class Daikin {
   constructor (log, config) {
     this.log = log
     this.config = config
-
-    this.bonjour = bonjour().findOne({ type: PLATFORM_NAME })
-    this.bonjour.on('up', (service) => {
-      this.foundAccessory(service)
-    })
+    this.host = null
 
     // TODO: Remove state
     this.targetTemperature = 18
@@ -28,10 +29,9 @@ class Daikin {
       .getCharacteristic(Characteristic.TargetHeatingCoolingState)
       .setProps({
         validValues: [
+          // I only want an on and off switch for the AC
           Characteristic.TargetHeatingCoolingState.OFF,
           Characteristic.TargetHeatingCoolingState.COOL
-          // I only want an on and off switch for the AC
-          // Characteristic.TargetHeatingCoolingState.AUTO
         ]
       })
       .on('get', this.getTargetHeatingCoolingState.bind(this))
@@ -56,6 +56,41 @@ class Daikin {
 
     // this.service
     //   .getCharacteristic(Characteristic.TemperatureDisplayUnits)
+
+    this.findESP8266()
+  }
+
+  findESP8266 () {
+    bonjour().findOne({ type: BONJOUR_TYPE }, async (service) => {
+      try {
+        this.host = await this.resolveHost(service)
+        this.log(`Found the ESP8266 running at ${this.host}`)
+
+        // http
+        //   .request({ method: 'GET', hostname: '10.0.0.34', path: '/' })
+        //   .then((body) => {
+        //     this.log(`> ${body}`)
+        //     this.service.getCharacteristic(Characteristic.On).updateValue(body === 'on')
+        //   })
+        //   .catch((error) => this.log.error(error.message))
+      } catch (err) {
+        this.log.error(err)
+      } finally {
+        setTimeout(() => this.findESP8266(), 60000)
+      }
+    })
+  }
+
+  async resolveHost (service) {
+    const host = await mdnsResolver.resolve4(service.host)
+
+    switch (service.txt.type) {
+      case PLATFORM_NAME:
+        return host
+
+      default:
+        return Promise.reject(new Error(`Found an ESP8266 running at ${host}, however its type \`${service.txt.type}\` is not compatible with \`${PLATFORM_NAME}\`!`))
+    }
   }
 
   // @implements {homebridge/lib/server.js}
@@ -65,25 +100,6 @@ class Daikin {
       .setCharacteristic(Characteristic.Model, 'LOLIN D1 mini')
 
     return [info, this.service]
-  }
-
-  async foundAccessory (service) {
-    if (service.txt.type && service.txt.type === PLATFORM_NAME) {
-      const uuid = UUID.generate(service.txt.mac)
-      const host = await mdnsResolver.resolve4(service.host)
-      const accessoryConfig = { host: host, port: service.port, name: service.name, serial: service.txt.mac }
-
-      this.log(host)
-
-      // this.log('< GET /')
-      // http
-      //   .request({ method: 'GET', hostname: '10.0.0.34', path: '/' })
-      //   .then((body) => {
-      //     this.log(`> ${body}`)
-      //     this.service.getCharacteristic(Characteristic.On).updateValue(body === 'on')
-      //   })
-      //   .catch((error) => this.log.error(error.message))
-    }
   }
 
   setTargetTemperature (value, callback) {
@@ -105,8 +121,4 @@ class Daikin {
   getTargetHeatingCoolingState (callback) {
     callback(null, this.targetHeatingCoolingState)
   }
-}
-
-module.exports = (homebridge) => {
-  homebridge.registerAccessory(PLUGIN_NAME, PLATFORM_NAME, Daikin)
 }
